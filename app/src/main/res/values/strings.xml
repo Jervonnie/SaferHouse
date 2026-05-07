@@ -46,6 +46,7 @@
     <string name="system_secured">SYSTEM STATUS: SECURED</string>
     <string name="log_analysis">LOG ANALYSIS</string>
     <string name="timestamp">TIMESTAMP</string>
+    <string name="Age">Age</string>
     <string name="status">STATUS</string>
     <string name="urgent">URGENT</string>
     <string name="resolved">RESOLVED</string>

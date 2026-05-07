@@ -38,8 +38,11 @@ class MainActivity : AppCompatActivity() {
             val prefViewModel: UserPreferenceViewModel = viewModel()
             val authViewModel: AuthViewModel = viewModel()
             val elderlyViewModel: ElderlyViewModel = viewModel(
-                factory = androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner.current?.let {
-                    androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+                factory = object : androidx.lifecycle.ViewModelProvider.Factory {
+                    @Suppress("UNCHECKED_CAST")
+                    override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                        return ElderlyViewModel(application, authViewModel) as T
+                    }
                 }
             )
             val caregiverViewModel: CaregiverViewModel = viewModel(
@@ -100,6 +103,7 @@ data class UserProfile(
 data class ElderlyMember(
     val id: String,
     val name: String,
+    val age: String = "",
     val address: String = "",
     val phoneNumber: String = "09XXXXXXXXX",
     val batteryLevel: Int = 100,
@@ -174,8 +178,12 @@ fun AppNavigation(
             SetupScreen(
                 role = role,
                 onNavigateBack = { navController.popBackStack() },
-                onComplete = { name, address, contact ->
-                    caregiverViewModel.updateProfile(name, address, contact)
+                onComplete = { name, age, address, contact ->
+                    if (role == "caregiver") {
+                        caregiverViewModel.updateProfile(name, address, contact)
+                    } else {
+                        elderlyViewModel.updateProfile(name, age, address, contact)
+                    }
                     authViewModel.logout()
                     navController.navigate("login") {
                         popUpTo(0) { inclusive = true }

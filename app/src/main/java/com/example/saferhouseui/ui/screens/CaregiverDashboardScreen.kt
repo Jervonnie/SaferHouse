@@ -48,7 +48,8 @@ data class LogData(
     val title: String,
     val msg: String,
     val time: String,
-    val elderName: String = "Unknown Member"
+    val elderName: String = "Unknown Member",
+    val age: String = ""
 )
 
 @Composable
@@ -389,11 +390,15 @@ fun DashboardContent(
             Spacer(modifier = Modifier.height(15.dp))
 
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                val log1Name = managedElders.getOrNull(0)?.name ?: "Lolo Mao"
-                val log2Name = managedElders.getOrNull(1)?.name ?: "Lola Maria"
+                val elder1 = managedElders.getOrNull(0)
+                val elder2 = managedElders.getOrNull(1)
+                val log1Name = elder1?.name ?: "Lolo Mao"
+                val log1Age = elder1?.age ?: "82"
+                val log2Name = elder2?.name ?: "Lola Maria"
+                val log2Age = elder2?.age ?: "75"
                 val demoLogs = listOf(
-                    LogData(Color(0xFF00C49A), "Safe Check", "$log1Name confirmed check-in", "Now", log1Name),
-                    LogData(Color(0xFFFFB800), "Fall Alert", "Possible fall detected for $log2Name", "12m ago", log2Name)
+                    LogData(Color(0xFF00C49A), "Safe Check", "$log1Name confirmed check-in", "Now", log1Name, log1Age),
+                    LogData(Color(0xFFFFB800), "Fall Alert", "Possible fall detected for $log2Name", "12m ago", log2Name, log2Age)
                 )
                 demoLogs.forEach { log ->
                     MiniActivityItem(log, fontScale, onClick = { onLogClick(log) })
@@ -530,10 +535,10 @@ fun LogDetailContent(
                     )
                     IndustrialLogTile(
                         modifier = Modifier.weight(1f),
-                        title = stringResource(R.string.status),
-                        value = if (log?.color == Color.Red) stringResource(R.string.urgent) else stringResource(R.string.resolved),
-                        icon = Icons.Default.Info,
-                        color = log?.color ?: PrimaryTeal,
+                        title = stringResource(R.string.Age),
+                        value = log?.age ?: "",
+                        icon = Icons.Default.Cake,
+                        color = PrimaryTeal,
                         fontScale = fontScale,
                         compact = true
                     )
@@ -1001,7 +1006,7 @@ fun ElderProfileContent(elder: ElderlyMember?, fontScale: Float, onBack: () -> U
                 
                 Spacer(modifier = Modifier.height(40.dp))
                 
-                CaregiverDetailSection(label = stringResource(R.string.phone_number), value = elder.phoneNumber, icon = Icons.Default.Phone, fontScale = fontScale)
+                CaregiverDetailSection(label = stringResource(R.string.Age), value = elder.age, icon = Icons.Default.Cake, fontScale = fontScale)
                 Spacer(modifier = Modifier.height(20.dp))
                 CaregiverDetailSection(label = stringResource(R.string.address), value = elder.address, icon = Icons.Default.LocationOn, fontScale = fontScale)
                 Spacer(modifier = Modifier.height(20.dp))
@@ -1077,16 +1082,22 @@ fun ActivityLogsContent(
     onLogClick: (LogData) -> Unit
 ) {
     val logs = if (specificElderName != null) {
+        val elder = managedElders.find { it.name == specificElderName }
+        val age = elder?.age ?: "82"
         listOf(
-            LogData(PrimaryTeal, "Fall Detected", "$specificElderName - Living Room Alert", "14:02", specificElderName),
-            LogData(Color(0xFFFFB800), "Activity Detected", "$specificElderName is moving", "12:45", specificElderName)
+            LogData(PrimaryTeal, "Fall Detected", "$specificElderName - Living Room Alert", "14:02", specificElderName, age),
+            LogData(Color(0xFFFFB800), "Activity Detected", "$specificElderName is moving", "12:45", specificElderName, age)
         )
     } else {
-        val name1 = managedElders.getOrNull(0)?.name ?: "Lolo Mao"
-        val name2 = managedElders.getOrNull(1)?.name ?: "Lola Maria"
+        val elder1 = managedElders.getOrNull(0)
+        val elder2 = managedElders.getOrNull(1)
+        val name1 = elder1?.name ?: "Lolo Mao"
+        val age1 = elder1?.age ?: "82"
+        val name2 = elder2?.name ?: "Lola Maria"
+        val age2 = elder2?.age ?: "75"
         listOf(
-            LogData(PrimaryTeal, "Fall Detected", "$name1 - Living Room Alert", "14:02", name1),
-            LogData(Color(0xFFFFB800), "Activity Detected", "$name2 - Bedroom Activity", "12:45", name2)
+            LogData(PrimaryTeal, "Fall Detected", "$name1 - Living Room Alert", "14:02", name1, age1),
+            LogData(Color(0xFFFFB800), "Activity Detected", "$name2 - Bedroom Activity", "12:45", name2, age2)
         )
     }
 
@@ -1335,7 +1346,13 @@ fun EditCaregiverProfileContent(
 }
 
 @Composable
-fun SleekInputFieldWhite(value: String, onValueChange: (String) -> Unit, placeholder: String, icon: ImageVector) {
+fun SleekInputFieldWhite(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    icon: ImageVector,
+    keyboardType: KeyboardType = KeyboardType.Text
+) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -1344,6 +1361,7 @@ fun SleekInputFieldWhite(value: String, onValueChange: (String) -> Unit, placeho
         leadingIcon = { Icon(imageVector = icon, contentDescription = null, tint = PrimaryTeal) },
         shape = RoundedCornerShape(16.dp),
         singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = PrimaryTeal,
             unfocusedBorderColor = Color.White.copy(alpha = 0.1f),
