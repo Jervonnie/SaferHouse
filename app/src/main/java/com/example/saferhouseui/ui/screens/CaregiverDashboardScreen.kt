@@ -245,13 +245,6 @@ fun DashboardContent(
                         fontWeight = FontWeight.ExtraBold,
                         letterSpacing = (-1).sp
                     )
-                    Text(
-                        text = stringResource(R.string.system_online),
-                        color = PrimaryTeal.copy(alpha = 0.5f),
-                        fontSize = 10.caregiverScaledSp(fontScale),
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 2.sp
-                    )
                 }
                 IconButton(
                     onClick = onNavigateToSettings,
@@ -406,15 +399,6 @@ fun DashboardContent(
             }
 
             Spacer(modifier = Modifier.weight(1f))
-
-            Text(
-                text = stringResource(R.string.system_secured),
-                color = PrimaryTeal.copy(alpha = 0.3f),
-                fontSize = 12.caregiverScaledSp(fontScale),
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.fillMaxWidth().padding(bottom = 30.dp),
-                textAlign = TextAlign.Center
-            )
         }
     }
 }

@@ -228,7 +228,11 @@ fun AppNavigation(
                     currentLanguage = prefViewModel.language,
                     currentFontSize = prefViewModel.fontSize,
                     isEmergencyActive = elderlyViewModel.isEmergencyActive,
+                    isConfirmationDialogOpen = elderlyViewModel.isConfirmationDialogOpen,
+                    countdownValue = elderlyViewModel.countdownValue,
                     onEmergencyToggle = { elderlyViewModel.toggleEmergency() },
+                    onConfirmEmergency = { elderlyViewModel.confirmEmergency() },
+                    onCancelEmergency = { elderlyViewModel.cancelEmergency() },
                     onLanguageChange = { prefViewModel.setAppLanguage(it) },
                     onFontSizeChange = { prefViewModel.setAppFontSize(it) },
                     onLogout = {
