@@ -101,7 +101,7 @@ fun CaregiverDashboardScreen(
                     currentScreen = "logs" 
                 },
                 onNavigateToSettings = { currentScreen = "settings" },
-                onNavigateToCallList = { triggerCall("911") },
+                onNavigateToCallList = { triggerCall("") },
                 onNavigateToManagement = { currentScreen = "elder_management" },
                 onNavigateToEditProfile = { currentScreen = "edit_profile" },
                 onLogClick = { log ->
@@ -185,7 +185,7 @@ fun CaregiverDashboardScreen(
                 log = selectedLog,
                 fontScale = fontScale,
                 onBack = { currentScreen = logBackDestination },
-                onCallEmergency = { triggerCall("911") }
+                onCallEmergency = { triggerCall("") }
             )
             "settings" -> SettingsContent(
                 name = caregiverName,

@@ -39,7 +39,7 @@
     <string name="caregiver_label">CAREGIVER</string>
     <string name="call_member">Emergency Call</string>
     <string name="emergency_hotline">911 Dial Support</string>
-    <string name="call_emergency_btn">CALL EMERGENCY (911)</string>
+    <string name="call_emergency_btn">CALL EMERGENCY ()</string>
     <string name="manage_elders">Manage Elders</string>
     <string name="profiles_and_logs">Profiles &amp; Logs</string>
     <string name="connected">Connected</string>
