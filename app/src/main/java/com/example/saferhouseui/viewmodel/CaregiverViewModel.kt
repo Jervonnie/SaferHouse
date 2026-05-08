@@ -20,7 +20,7 @@ class CaregiverViewModel(private val authViewModel: AuthViewModel) : ViewModel()
                 contact = contact
             )
             
-            // Auto-populate first elderly member for demo purposes if caregiver
+            // Autopopulate first elderly member for demo purposes if caregiver
             if (updatedUser.role == "caregiver" && updatedUser.managedElders.isEmpty()) {
                 updatedUser.managedElders.add(ElderlyMember("1", "Lolo Mao", "82", "QC Area", "0912-345-6789", 100, "Safe", "Just now"))
             }
