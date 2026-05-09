@@ -41,4 +41,26 @@ class CaregiverViewModel(private val authViewModel: AuthViewModel) : ViewModel()
             authViewModel.updateUser(user.copy(managedElders = newList))
         }
     }
+
+    fun updateCheckInSchedule(elderId: String, days: List<String>, time: String) {
+        authViewModel.currentUser?.let { user ->
+            val updatedElders = user.managedElders.map {
+                if (it.id == elderId) {
+                    it.copy(checkInDays = days, checkInTime = time)
+                } else it
+            }.toMutableList()
+            authViewModel.updateUser(user.copy(managedElders = updatedElders))
+        }
+    }
+
+    fun updateEmergencyContacts(elderId: String, contacts: List<String>) {
+        authViewModel.currentUser?.let { user ->
+            val updatedElders = user.managedElders.map {
+                if (it.id == elderId) {
+                    it.copy(emergencyContacts = contacts)
+                } else it
+            }.toMutableList()
+            authViewModel.updateUser(user.copy(managedElders = updatedElders))
+        }
+    }
 }

@@ -53,10 +53,14 @@ fun ElderlyDashboardScreen(
     currentFontSize: String,
     isEmergencyActive: Boolean,
     isConfirmationDialogOpen: Boolean,
+    isCheckInPending: Boolean,
+    isLocalAlarmActive: Boolean,
     countdownValue: Int,
     onEmergencyToggle: () -> Unit,
     onConfirmEmergency: () -> Unit,
     onCancelEmergency: () -> Unit,
+    onCheckInResponse: () -> Unit,
+    onStopAlarm: () -> Unit,
     onLanguageChange: (String) -> Unit,
     onFontSizeChange: (String) -> Unit,
     onLogout: () -> Unit
@@ -115,7 +119,11 @@ fun ElderlyDashboardScreen(
                                 elderName = elderName,
                                 fontScale = fontScale,
                                 isEmergencyActive = isEmergencyActive,
-                                onEmergencyToggle = onEmergencyToggle
+                                isCheckInPending = isCheckInPending,
+                                isLocalAlarmActive = isLocalAlarmActive,
+                                onEmergencyToggle = onEmergencyToggle,
+                                onCheckInResponse = onCheckInResponse,
+                                onStopAlarm = onStopAlarm
                             )
                             "profile" -> ElderlyProfileContent(
                                 name = elderName,
@@ -152,7 +160,11 @@ fun ElderlyDashboardContent(
     elderName: String,
     fontScale: Float,
     isEmergencyActive: Boolean,
-    onEmergencyToggle: () -> Unit
+    isCheckInPending: Boolean,
+    isLocalAlarmActive: Boolean,
+    onEmergencyToggle: () -> Unit,
+    onCheckInResponse: () -> Unit,
+    onStopAlarm: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -161,6 +173,72 @@ fun ElderlyDashboardContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
+        if (isLocalAlarmActive) {
+            Surface(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                color = Color.Red,
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Alarm, contentDescription = null, tint = Color.White)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("ALARM ACTIVE", color = Color.White, fontWeight = FontWeight.Black)
+                    }
+                    Button(
+                        onClick = onStopAlarm,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                    ) {
+                        Text("STOP", color = Color.Red, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+        }
+
+        if (isCheckInPending) {
+            Surface(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                color = PrimaryTeal,
+                shape = RoundedCornerShape(20.dp),
+                border = BorderStroke(2.dp, Color.White.copy(alpha = 0.5f))
+            ) {
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(Icons.Default.HealthAndSafety, contentDescription = null, tint = Color.White, modifier = Modifier.size(40.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = "DAILY SAFETY CHECK",
+                        color = Color.White,
+                        fontSize = 18.scaledSp(fontScale),
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = "Are you feeling okay today?",
+                        color = Color.White.copy(alpha = 0.8f),
+                        fontSize = 14.scaledSp(fontScale),
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Button(
+                        onClick = onCheckInResponse,
+                        modifier = Modifier.fillMaxWidth().height(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("I'M OKAY", color = PrimaryTeal, fontWeight = FontWeight.Black)
+                    }
+                }
+            }
+        }
+
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = stringResource(R.string.welcome, elderName),

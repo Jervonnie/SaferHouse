@@ -24,6 +24,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.saferhouseui.data.model.ActivityLog
 import com.example.saferhouseui.ui.screens.*
 import com.example.saferhouseui.ui.theme.PrimaryTeal
 import com.example.saferhouseui.ui.theme.SaferHouseUITheme
@@ -131,7 +132,8 @@ data class UserProfile(
     var name: String = "",
     var address: String = "",
     var contact: String = "",
-    val managedElders: MutableList<ElderlyMember> = mutableListOf()
+    val managedElders: MutableList<ElderlyMember> = mutableListOf(),
+    val activityLogs: MutableList<ActivityLog> = mutableListOf()
 )
 
 data class ElderlyMember(
@@ -142,7 +144,10 @@ data class ElderlyMember(
     val phoneNumber: String = "09XXXXXXXXX",
     val batteryLevel: Int = 100,
     val status: String = "Safe",
-    val lastSeen: String = "Just now"
+    val lastSeen: String = "Just now",
+    var checkInDays: List<String> = emptyList(), // e.g., ["Monday", "Wednesday"]
+    var checkInTime: String = "", // e.g., "Morning" or "10:00 AM"
+    var emergencyContacts: List<String> = emptyList() // List of phone numbers
 )
 
 @Composable
@@ -240,6 +245,13 @@ fun AppNavigation(
                     onRemoveElder = { elderId ->
                         caregiverViewModel.removeElderlyMember(elderId)
                     },
+                    onUpdateCheckIn = { elderId, days, time ->
+                        caregiverViewModel.updateCheckInSchedule(elderId, days, time)
+                    },
+                    onUpdateEmergencyContacts = { elderId, contacts ->
+                        caregiverViewModel.updateEmergencyContacts(elderId, contacts)
+                    },
+                    activityLogs = user.activityLogs,
                     onLogout = {
                         authViewModel.logout()
                         navController.navigate("login") {
@@ -263,10 +275,14 @@ fun AppNavigation(
                     currentFontSize = prefViewModel.fontSize,
                     isEmergencyActive = elderlyViewModel.isEmergencyActive,
                     isConfirmationDialogOpen = elderlyViewModel.isConfirmationDialogOpen,
+                    isCheckInPending = elderlyViewModel.isCheckInPending,
+                    isLocalAlarmActive = elderlyViewModel.isLocalAlarmActive,
                     countdownValue = elderlyViewModel.countdownValue,
                     onEmergencyToggle = { elderlyViewModel.toggleEmergency() },
                     onConfirmEmergency = { elderlyViewModel.confirmEmergency() },
                     onCancelEmergency = { elderlyViewModel.cancelEmergency() },
+                    onCheckInResponse = { elderlyViewModel.respondToCheckIn() },
+                    onStopAlarm = { elderlyViewModel.stopLocalAlarm() },
                     onLanguageChange = { prefViewModel.setAppLanguage(it) },
                     onFontSizeChange = { prefViewModel.setAppFontSize(it) },
                     onLogout = {
