@@ -24,7 +24,6 @@ class EmergencyManager(private val context: Context) {
 
     suspend fun executeEscalation(user: User?, contacts: List<EmergencyContact>) {
         val elderName = user?.fullName ?: "User"
-        val elderContact = user?.phoneNumber ?: "Unknown"
         
         // 1. Get Coordinates
         val locationLink = try {
@@ -41,19 +40,20 @@ class EmergencyManager(private val context: Context) {
                 }
 
                 if (location != null) {
-                    "https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}"
+                    "Coords: ${location.latitude}, ${location.longitude}"
                 } else {
-                    "Location unavailable"
+                    ""
                 }
             } else {
-                "Permission denied"
+                ""
             }
         } catch (e: Exception) {
             Log.e("EmergencyManager", "Error getting location: ${e.message}")
-            "Error retrieving location"
+            ""
         }
 
-        val message = "EMERGENCY ALERT: $elderName (Ph: $elderContact) needs help!\nMaps: $locationLink"
+        // Extremely simple message without links to bypass strict carrier/spam filters
+        val message = "SaferHouse: $elderName needs help! $locationLink".trim()
 
         // 2. Local Alarm (Siren)
         triggerLocalAlarm()
@@ -63,7 +63,7 @@ class EmergencyManager(private val context: Context) {
         val primaryContacts = sortedContacts.filter { !it.isBarangay }
         
         val smsManager: SmsManager? = try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 context.getSystemService(SmsManager::class.java)
             } else {
                 @Suppress("DEPRECATION")
@@ -90,7 +90,7 @@ class EmergencyManager(private val context: Context) {
             // 5. Barangay Escalation
             val barangayContacts = sortedContacts.filter { it.isBarangay }
             barangayContacts.forEach { contact ->
-                sendSms(smsManager, contact.phoneNumber, "[ESCALATED] $message")
+                sendSms(smsManager, contact.phoneNumber, "ESCALATED: $message")
             }
         } else {
             Log.e("EmergencyManager", "SmsManager is null, cannot send SMS")
@@ -105,20 +105,25 @@ class EmergencyManager(private val context: Context) {
     }
 
     private fun sendSms(smsManager: SmsManager, phoneNumber: String, message: String) {
+        if (phoneNumber.isBlank()) return
+        
+        // Clean phone number: remove spaces, dashes, parentheses
+        val cleanNumber = phoneNumber.replace(Regex("[^0-9+]"), "")
+        
         try {
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED) {
                 val parts = smsManager.divideMessage(message)
                 if (parts.size > 1) {
-                    smsManager.sendMultipartTextMessage(phoneNumber, null, parts, null, null)
+                    smsManager.sendMultipartTextMessage(cleanNumber, null, parts, null, null)
                 } else {
-                    smsManager.sendTextMessage(phoneNumber, null, message, null, null)
+                    smsManager.sendTextMessage(cleanNumber, null, message, null, null)
                 }
-                Log.d("EmergencyManager", "SMS sent to $phoneNumber")
+                Log.d("EmergencyManager", "SMS triggered to $cleanNumber: $message")
             } else {
                 Log.e("EmergencyManager", "SEND_SMS permission missing")
             }
         } catch (e: Exception) {
-            Log.e("EmergencyManager", "Failed to send SMS to $phoneNumber: ${e.message}")
+            Log.e("EmergencyManager", "Failed to send SMS to $cleanNumber: ${e.message}")
         }
     }
 
